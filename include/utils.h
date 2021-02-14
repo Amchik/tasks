@@ -17,4 +17,6 @@ int strdlen(const char* string);
 char* strapnd(const char* s1, const char* s2);
 char* strcapnd(char* original, char new);
 
+char* itoa(int n);
+
 #endif

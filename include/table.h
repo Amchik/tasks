@@ -33,6 +33,10 @@ struct table {
   // Array of rows.
   // Must be ends to 0
   struct row* rows;
+
+  // Prints color before row clrBefore
+  // NOTE: first row is 0, set to -1 to print in start
+  int clrBefore;
 };
 
 // Create new row by color and records.

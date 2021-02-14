@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "include/table.h"
+#include "include/utils.h"
 
 // Create new row by color and records.
 // Usage: createrow(color, record1, record2...)
@@ -12,8 +13,8 @@ struct row*   __createrow(int n, struct color color, ...) {
   struct row* row = malloc(sizeof(struct row));
   row->color = color;
   
-  record_t* records = malloc((n + 1) * sizeof(record_t));
-  records[n] = 0;
+  record_t* records = malloc((n + 2) * sizeof(record_t));
+  records[n + 1] = 0;
   va_list lst;
   va_start(lst, color);
   for(int i = 0; i < n + 1; i++) {
@@ -29,11 +30,12 @@ struct row*   __createrow(int n, struct color color, ...) {
 // Usage: createtable(masterrow, row1, row2...)
 struct table* __createtable(int n, struct row masterrow, ...) {
   struct table* table = malloc(sizeof(struct table));
+  table->clrBefore = -1;
   table->masterrow = masterrow;
 
-  struct row* rows = malloc((n + 1) * sizeof(struct row));
+  struct row* rows = malloc((n + 2) * sizeof(struct row));
   struct row nul = {.color = rgbi(0), .records = 0};
-  rows[n] = nul;
+  rows[n + 1] = nul;
   va_list lst;
   va_start(lst, masterrow);
   for(int i = 0; i <= n; i++) {
@@ -78,23 +80,25 @@ size_t tablelen(struct table* table) {
 
 // --- DRAWING ---
 
-char* _tostr(int n) {
-  char* ans = calloc(12, sizeof(char));
-  sprintf(ans, "%d", n);
-  return(ans);
-}
-
 void _printrow
-(bool printNum, int n, int numbericlen, int rowsc, const int* rowslen, const struct row* row, FILE* fp) {
+(bool printNum, int n, int numbericlen, int rowsc, const int* rowslen, const struct row* row, int clrBefore, FILE* fp) {
   if (!printNum) {
-    for(int j = 0; j < (numbericlen + 4); j++) putc(' ', fp);
+    for(int j = 0; j < (numbericlen + 2); j++) putc(' ', fp);
+    if (clrBefore == -1) fprintf(fp, "  ");
   } else {
-    fprintf(fp, "\e[48;2;%u;%u;%um \e[0m ", row->color.red, row->color.green, row->color.blue);
+    if (clrBefore == -1)
+      fprintf(fp, "\e[48;2;%u;%u;%um \e[0m ", row->color.red, row->color.green, row->color.blue);
     fprintf(fp, "#%u", n);
-    int nlen = strlen(_tostr(n));
+    int nlen = strlen(itoa(n));
     for(int j = 0; j < (numbericlen - nlen + 1); j++) putc(' ', fp);
   }
   for(int i = 0; i < rowsc; i++) {
+    if (i == clrBefore) {
+      if (printNum)
+        fprintf(fp, "\e[48;2;%u;%u;%um \e[0m ", row->color.red, row->color.green, row->color.blue);
+      else
+        fprintf(fp, "  ");
+    }
     record_t rc = row->records[i];
     bool recordended = false;
     for (int j = 0; j < rowslen[i]; j++) {
@@ -122,7 +126,7 @@ void drawtable(struct table* table, FILE* fp) {
   int tbllen;
   // Getting lengths
   tbllen = tablelen(table);
-  numbericlen = strlen(_tostr(tbllen));
+  numbericlen = strlen(itoa(tbllen));
   rowsc = rowlen(&table->masterrow);
   rowslen = malloc(sizeof(int) * rowsc);
   for(int i = 0; i < rowsc; i++) {
@@ -137,13 +141,13 @@ void drawtable(struct table* table, FILE* fp) {
 
   // printing master row
   fprintf(fp, "\e[1;4m");
-  _printrow(false, 0, numbericlen, rowsc, rowslen, &table->masterrow, fp);
+  _printrow(false, 0, numbericlen, rowsc, rowslen, &table->masterrow, table->clrBefore, fp);
   fprintf(fp, "\e[0m\n");
 
   // printing another rows
   for(int i = 0; i < tbllen; i++) {
     struct row* row = table->rows + i;
-    _printrow(true, i + 1, numbericlen, rowsc, rowslen, row, fp);
+    _printrow(true, i + 1, numbericlen, rowsc, rowslen, row, table->clrBefore, fp);
     putc('\n', fp);
   }
 
