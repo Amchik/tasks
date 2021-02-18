@@ -9,3 +9,7 @@ tasks: $(obj)
 .PHONY: clean
 clean:
 	rm -f $(obj) tasks
+
+check: tasks
+	@echo "not completed yet"
+	./tasks "task hello with label general and priority 3"

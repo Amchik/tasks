@@ -36,6 +36,6 @@ int main(int argc, char** argv) {
       } while (prm->parameter != 0);
     }
   }
-  return(0);
+  return(ln.code);
 }
 
