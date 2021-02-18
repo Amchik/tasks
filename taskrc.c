@@ -106,7 +106,8 @@ char* prsstr(void* data, size_t* n,
         c = readch(data, n);
         if (mlfchar(c)) goto MLFC;
       }
-      str[sn++] = c;
+      str[sn] = c;
+      sn++;
     } else {
 MLFC:
       _STRPRSTHROW = 2;
@@ -116,9 +117,9 @@ MLFC:
     c = readch(data, n);
   }
   // optimize
-  char* new = malloc((sn + 2) * sizeof(char));
-  memcpy(new, str, sn + 1);
-  new[sn + 1] = 0;
+  char* new = malloc((sn + 1) * sizeof(char));
+  memcpy(new, str, sn);
+  new[sn] = 0;
   free(str);
   return(new);
 }
