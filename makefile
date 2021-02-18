@@ -9,11 +9,8 @@ CFLAGS += -Wall
 tasks: $(obj)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-fetchsubmodules:
-	git submodule update
-
 test: export CFLAGS+= -D__HAS_TEST_EXECUTABLE
-test: fetchsubmodules $(obj) $(testobj)
+test: $(obj) $(testobj)
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 .PHONY: clean
