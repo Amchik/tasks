@@ -116,6 +116,9 @@ MLFC:
     }
     c = readch(data, n);
   }
+  // haha, you read this... umm...
+  // pls double press Page Down
+  if (q) (*n)++;
   // optimize
   char* new = malloc((sn + 1) * sizeof(char));
   memcpy(new, str, sn);
