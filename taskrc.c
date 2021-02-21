@@ -91,7 +91,7 @@ char* prsstr(void* data, size_t* n,
     q = true;
     c = readch(data, n);
   }
-  while ((q && c != '"') || (!q && (c != ' ' && !mlfchar(c)))) {
+  while ((q && c != '"') || (!q && (c != ' ' && c != '\t' && !mlfchar(c)))) {
     if ((q && !mlfchar(c)) || !q) {
       if (sn + 2 > max) {
         if (max + ST_STR_JUMP >= ST_STR_MAXLEN) {
@@ -129,7 +129,8 @@ MLFC:
 
 static unsigned int _LSTPRSTHROW = 0;
 
-struct rcstatementlist* prslst(void* data, size_t* n,
+#define prslst prslst_old
+struct rcstatementlist* prslst_old(void* data, size_t* n,
     char (*readch) (void* obj, size_t* n), const char* type) {
   _LSTPRSTHROW = 0;
   int max = 4;
@@ -163,20 +164,28 @@ struct rcstatementlist* prslst(void* data, size_t* n,
     // i have no idea how it work...
     // upd: it not work, um..., todo: create issue about it, when
     //  it throw segfault... um...
-    if (_vlen - 1 == (*n - on - 1) && value[_vlen - 1] == ',') {
-      value[_vlen - 1] = 0;
-      hasDelim = true;
+    if (_vlen == (*n - on - 1)) {
+      if (value[_vlen - 1] == ',') {
+        value[_vlen - 1] = 0;
+        hasDelim = true;
+      }
+    } else {
+      c = skipwh(data, n, readch, false);
+      if (c == ',') {
+        hasDelim = true;
+        (*n)++;
+      }
     }
     // encapsulating
     struct rcstatementlist entry = {.parameter = key, .value = value};
-    if (ln + 2 >= max) {
+    if (ln + 1 >= max) {
       if (max + ST_LST_JUMP >= ST_LST_MAXLEN) {
         free(lst);
         _LSTPRSTHROW = 2;
         return(0);
       }
       max += ST_LST_JUMP;
-      lst = realloc(lst, max);
+      lst = realloc(lst, max * sizeof(*lst));
     }
     lst[ln] = entry;
     ln++;
@@ -189,11 +198,12 @@ struct rcstatementlist* prslst(void* data, size_t* n,
       c = skipwh(data, n, readch, false);
       if (c == ',') continue;
       (*n)--;
+      size_t oldn = *n;
       char* and = prsstr(data, n, readch, false);
       if (!and || strcmp(and, "and") != 0) {
-        free(lst);
         _LSTPRSTHROW = 3;
-        return(0);
+        *n = oldn;
+        break;
       }
       hasEnd = true;
     } else break;

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
 
 #include "testoasterror/src/testoasterror.h"
@@ -25,41 +26,32 @@ void _prinrcline(char* q, struct rcline ln) {
   }
 }
 
-void test_simple_query(struct testoasterror* test) {
-  char* q = "task hello with label generic and priority 6";
+struct rcline test_query(struct testoasterror *test, char* q, int vn, ...) {
   size_t n = 0;
   struct rcline line = rcparseln(q, &n);
   testoasterror(test, !line.code);
   if (!line.code) {
-    testoasterror(test, strcmp(line.statement->primary, "hello") == 0);
-    testoasterror(test, strcmp(line.statement->params[0].parameter, "label") == 0);
-    testoasterror(test, strcmp(line.statement->params[1].value, "6") == 0);
+    va_list lst;
+    va_start(lst, vn);
+    for (int i = 0; i < vn; i++) {
+      char* val = va_arg(lst, char*);
+      testoasterror(test, strcmp(
+            line.statement->params[i].value,
+            val
+            ) == 0);
+    }
+    va_end(lst);
   }
   _prinrcline(q, line);
-}
-
-void test_query_with_quotes(struct testoasterror* test) {
-  char* q = "task \"Hello world!\" with label \"Hmm, its looks like \\\"label\\\"...\" and priority 5";
-  size_t n = 0;
-  struct rcline line = rcparseln(q, &n);
-  testoasterror(test, !line.code);
-  if (!line.code) {
-    testoasterror(test, strcmp(line.statement->primary, "Hello world!") == 0);
-    testoasterror(test, strcmp(line.statement->params[0].value, "Hmm, its looks like \"label\"...") == 0);
-    testoasterror(test, strcmp(line.statement->params[1].value, "5") == 0);
-  }
-  _prinrcline(q, line);
+  return(line);
 }
 
 void test_query_2_props(struct testoasterror *test) {
-  char* q = "task test with label foo, label bar and label banana";
-  size_t n = 0;
-  struct rcline line = rcparseln(q, &n);
-  testoasterror(test, !line.code);
-  if (!line.code) {
-    testoasterror(test, strcmp(line.statement->params[0].value, "foo") == 0);
-    testoasterror(test, strcmp(line.statement->params[2].value, "banana") == 0);
-  }
-  _prinrcline(q, line);
+  test_query(test, "task hello with label \"xxx\", label yyy, label zzz and priority 5 completed",
+      3, "xxx", "yyy", "zzz");
 }
 
+void test_query_with_quotes(struct testoasterror* test) {
+  char* q = "task \"Hello world!\" with label \"str \\\"label\\\"...\" and priority 5";
+  test_query(test, q, 2, "str \"label\"...", "5");
+}
