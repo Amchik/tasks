@@ -18,5 +18,5 @@ clean:
 	rm -f $(obj) $(testobj) tasks test
 
 .PHONY: check
-check: clean test
+check: test
 	./test

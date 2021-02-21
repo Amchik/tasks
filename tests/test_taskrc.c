@@ -51,3 +51,15 @@ void test_query_with_quotes(struct testoasterror* test) {
   _prinrcline(q, line);
 }
 
+void test_query_2_props(struct testoasterror *test) {
+  char* q = "task test with label foo, label bar and label banana";
+  size_t n = 0;
+  struct rcline line = rcparseln(q, &n);
+  testoasterror(test, !line.code);
+  if (!line.code) {
+    testoasterror(test, strcmp(line.statement->params[0].value, "foo") == 0);
+    testoasterror(test, strcmp(line.statement->params[2].value, "banana") == 0);
+  }
+  _prinrcline(q, line);
+}
+
