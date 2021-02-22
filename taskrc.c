@@ -102,7 +102,8 @@ char* prsstr(void* data, size_t* n,
         max += ST_STR_JUMP;
         str = realloc(str, max);
       }
-      if (c == '\\') {
+      if (q && c == '\\') {
+        // um... pls ignore it...
         c = readch(data, n);
         if (mlfchar(c)) goto MLFC;
       }
@@ -155,7 +156,6 @@ struct rcstatementlist* prslst_old(void* data, size_t* n,
     }
     c = skipwh(data, n, readch, true);
     size_t on = *n;
-    *cstart = *n;
     char* value = prsstr(data, n, readch, true);
     if (!value) {
       free(lst);

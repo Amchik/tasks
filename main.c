@@ -32,7 +32,6 @@ int main(int argc, char** argv) {
       printf("\e[0m\n");
     }
   } else {
-    puts("umm, yeah... parsed... (in gdb main.c:31, res have result of parse)");
     struct rcstatement stm = res.statement;
     printf(
       "%s %s",
