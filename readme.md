@@ -10,13 +10,15 @@ Parsing config queryies (taskrc):
 
 Syntax: `<type> <primary> [with <<param> <value>>[, <param> <value>]... [and <param> <value>]] [post]`.
 
-Btw, `post` currently not works.
-
 Examples:
 
 ```
 task "Fix this \"todo manager\"" with label github and priority 0  
 task "Make a soup"               with label food   ,   priority 10 completed
+task "Go to a shop"              completed
+
+label github 
+label food   with color #e74c3c
 ```
 
 ## Building
