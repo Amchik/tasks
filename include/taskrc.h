@@ -22,7 +22,33 @@ struct rcstatement {
   const char* post;
 };
 
-// TaskRC line
+// Describes parsing error
+struct rcparseerror {
+  // Error code (see todo.com for more info)
+  unsigned int code;
+
+  // # of start char
+  unsigned int cstart;
+  // # of error char
+  unsigned int cend;
+};
+
+// Result of parsing
+struct rcparseresult {
+  // Result of parsing
+  struct rcstatement statement;
+  // Error
+  struct rcparseerror error;
+};
+
+// Result of parsing file
+struct rcfile {
+  // Statements, pointer can be zero
+  // if line is empty
+  struct rcparseresult** result;
+};
+
+// TaskRC line [OBSOLETE]
 struct rcline {
   unsigned int linen;
   unsigned int code;
@@ -32,7 +58,7 @@ struct rcline {
 bool rchastype(const char* type);
 bool rchasparam(const char* param, const char* type);
 
-struct rcline rcparseln(const char* data, size_t* n);
-struct rcline* rcparselns(const char* data, size_t offset);
+struct rcparseresult rcparseln(const char* data, size_t* n);
+struct rcfile rcparselns(const char* data, size_t offset);
 
 #endif

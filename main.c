@@ -20,25 +20,39 @@ int main(int argc, char** argv) {
   }
   q[strlen(q) - 1] = 0;
   size_t n = 0;
-  struct rcline ln = rcparseln(q, &n);
-  printf("Result of parse query:\n\tQuery:\t\t\"%s\"\n\tStatus code:\t%u\n\tChar:\t\t%d (near \"%s\")\n\tStatement:\t0x%x\n",
-      q, ln.code, ln.linen, q + ln.linen, (size_t)ln.statement);
-  if (ln.statement != 0) {
-    struct rcstatement stm = *ln.statement;
-    printf("Statement:\n\tType:\t\t%s\n\tPrimary:\t\"%s\"\n"
-        "\tParams:\t\t0x%x\n\tPost:\t\t0x%x (\"%s\")\n",
-        stm.type, stm.primary, (size_t)stm.params, (size_t)stm.post, stm.post);
-    if (stm.params != 0) {
-      puts("Params:");
-      struct rcstatementlist* prm = stm.params;
-      do {
-        printf("\t[@0x%x] \"%s\"\t:: [@0x%x] \"%s\"\n",
-            (size_t)prm->parameter, prm->parameter, (size_t)prm->value, prm->value);
-        prm += 1;
-      } while (prm->parameter != 0);
+  struct rcparseresult res = rcparseln(q, &n);
+  if (res.error.code != 0) {
+    printf("Error [%u]:\n | %s\n | \e[1;31m", res.error.code, q);
+    if (res.error.cstart > res.error.cend) {
+      printf("> cstart=%d;cend=%d \e[0m\n", res.error.cstart, res.error.cend);
+    } else {
+      for(int i = 0; i < res.error.cstart; i++) putc(' ', stdout);
+      putc('^', stdout);
+      for(int i = 0; i < (int)res.error.cend - (int)res.error.cstart - 2; i++) putc('~', stdout);
+      printf("\e[0m\n");
     }
+  } else {
+    puts("umm, yeah... parsed... (in gdb main.c:31, res have result of parse)");
+    struct rcstatement stm = res.statement;
+    printf(
+      "%s %s",
+      stm.type,
+      stm.primary
+    );
+    if (stm.params) {
+      printf("\n\twith ");
+      for (int i = 0; stm.params[i].parameter != 0; i++) {
+        printf("%s \"%s\", ", stm.params[i].parameter,
+            stm.params[i].value);
+      }
+      printf("\b\b  ");
+    }
+    if (stm.post) {
+      printf("\n\t%s", stm.post);
+    }
+    printf("\n");
   }
-  return(ln.code);
+  return(res.error.code);
 }
 
 #endif

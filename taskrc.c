@@ -131,7 +131,7 @@ static unsigned int _LSTPRSTHROW = 0;
 
 #define prslst prslst_old
 struct rcstatementlist* prslst_old(void* data, size_t* n,
-    char (*readch) (void* obj, size_t* n), const char* type) {
+    char (*readch) (void* obj, size_t* n), const char* type, size_t* cstart) {
   _LSTPRSTHROW = 0;
   int max = 4;
   int ln = 0;
@@ -141,6 +141,7 @@ struct rcstatementlist* prslst_old(void* data, size_t* n,
   while (true) {
     bool hasDelim = false;
     c = skipwh(data, n, readch, true);
+    *cstart = *n;
     char* key = prsstr(data, n, readch, false);
     if (!key) {
       free(lst);
@@ -154,6 +155,7 @@ struct rcstatementlist* prslst_old(void* data, size_t* n,
     }
     c = skipwh(data, n, readch, true);
     size_t on = *n;
+    *cstart = *n;
     char* value = prsstr(data, n, readch, true);
     if (!value) {
       free(lst);
@@ -216,33 +218,44 @@ struct rcstatementlist* prslst_old(void* data, size_t* n,
   return(new);
 }
 
-struct rcline _rcparseln(void* data, size_t* n, 
+void _formres(struct rcparseresult* res, struct rcparseerror* err) {
+  res->error = *err;
+  struct rcstatement stm = {0,0,0,0};
+  res->statement = stm;
+}
+
+struct rcparseresult _rcparseln(void* data, size_t* n, 
     char (*readch) (void* obj, size_t* n), bool typecheck) {
-  struct rcline ans = {0,0,0};
+  struct rcparseresult res = {0,0};
+  struct rcparseerror err = {0,0,0};
   //struct rcstatement* stm = malloc(sizeof(*stm));
   //ans.statement = stm;
-  char c = ' ';
+  char c;
   // *skip whitespaces*
   c = skipwh(data, n, readch, true);
   // TYPE PRIMARY with KEY VALUE, KEY VALUE and KEY VALUE POST
   // ^~~~
+  err.cstart = *n;
   char* type = prsstr(data, n, readch, false);
   if (!type) {
-STRNUL:
-    ans.code = 100 + _STRPRSTHROW;
-    ans.linen = *n;
-    return(ans);
+  STRNUL:
+    err.code = 100 + _STRPRSTHROW;
+    err.cend = *n;
+    _formres(&res, &err);
+    return(res);
   }
   // hmm, may be it useless?
   if (typecheck && !rchastype(type)) {
     free(type);
-    ans.code = 120 + 1;
-    ans.linen = *n;
-    return(ans);
+    err.code = 120 + 1;
+    err.cend = *n;
+    _formres(&res, &err);
+    return(res);
   }
   // TYPE PRIMARY with KEY VALUE, KEY VALUE and KEY VALUE POST
   //      ^~~~~~~
   c = skipwh(data, n, readch, true);
+  err.cstart = *n;
   char* primary = prsstr(data, n, readch, true);
   if (!primary) {
     free(type);
@@ -251,47 +264,54 @@ STRNUL:
   // TYPE PRIMARY with KEY VALUE, KEY VALUE and KEY VALUE POST
   //              ^~~~
   c = skipwh(data, n, readch, true);
-  char* _with = prsstr(data, n, readch, false);
-  if (!_with) {
-    free(type);
-    free(primary);
-    goto STRNUL;
-  }
-  if (strcmp(_with, "with") != 0) {
+  size_t oldn = *n;
+  err.cstart = *n;
+  char* _with = prsstr(data, n, readch, true);
+  char* post = 0;
+  struct rcstatementlist* lst = 0;        /*       without "      */
+  if (_with && strcmp(_with, "with") == 0 && (4 == (*n - oldn - 1))) {
+    // TYPE PRIMARY with KEY VALUE, KEY VALUE and KEY VALUE POST
+    //                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    char* _ttype = type;
+    if (!typecheck) _ttype = 0;
+    err.cstart = *n;
+    lst = prslst(data, n, readch, _ttype, &err.cstart);
+    if (!lst) {
+      free(lst);
+      free(type);
+      free(primary);
+      err.code = 160 + _LSTPRSTHROW;
+      err.cend = *n;
+      _formres(&res, &err);
+      return(res);
+    }
     free(_with);
-    free(type);
-    free(primary);
-    ans.code = 140 + 1;
-    ans.linen = *n;
-    return(ans);
+  } else if (_with) {
+    // TYPE PRIMARY POST
+    //              ^~~~
+    post = _with;
   }
-  free(_with);
-  // TYPE PRIMARY with KEY VALUE, KEY VALUE and KEY VALUE POST
-  //                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  char* _ttype = type;
-  if (!typecheck) _ttype = 0;
-  struct rcstatementlist* lst = prslst(data, n, readch, _ttype);
-  if (!lst) {
-    free(lst);
-    free(type);
-    free(primary);
-    ans.code = 160 + _LSTPRSTHROW;
-    ans.linen = *n;
-    return(ans);
+  if (!post) {
+    // TYPE PRIMARY with KEY VALUE, KEY VALUE and KEY VALUE POST
+    //                                                      ^~~~
+    c = skipwh(data, n, readch, true);
+    if (!mlfchar(c)) {
+      err.cstart = *n;
+      post = prsstr(data, n, readch, true);
+    }
   }
-  struct rcstatement* stm = malloc(sizeof(*stm));
+  struct rcstatement* stm = &res.statement;
   stm->type = type;
   stm->primary = primary;
   stm->params = lst;
-  stm->post = "TODO:";
-  ans.linen = 0;
-  ans.code = 0;
-  ans.statement = stm; 
-  return(ans);
+  stm->post = post;
+  err.code = 0;
+  err.cend = 0;
+  return(res);
 }
 
-struct rcline rcparseln(const char* data, size_t* n) {
+struct rcparseresult rcparseln(const char* data, size_t* n) {
   return(_rcparseln((void*)data, n, (char (*) (void* a1, size_t* a2))_readchc, true));
 }
-struct rcline* rcparselns(const char* data, size_t offset);
+//struct rcline* rcparselns(const char* data, size_t offset);
 
