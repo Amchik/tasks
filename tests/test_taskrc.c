@@ -18,7 +18,6 @@ void _prinrcline(char* q, struct rcparseresult res) {
       printf("\e[0m\n");
     }
   } else {
-    puts("umm, yeah... parsed... (in gdb main.c:31, res have result of parse)");
     struct rcstatement stm = res.statement;
     printf(
       "%s %s",
@@ -58,6 +57,8 @@ struct rcparseresult test_query(struct testoasterror *test, char* q, int vn, ...
     char* post = va_arg(lst, char*);
     if (post) {
       testoasterror(test, strcmp(res.statement.post, post) == 0);
+    } else {
+      testoasterror(test, !res.statement.post);
     }
     va_end(lst);
   }
@@ -74,3 +75,8 @@ void test_query_with_quotes(struct testoasterror* test) {
   char* q = "task \"Hello world!\" with label \"str \\\"label\\\"...\" and priority 5";
   test_query(test, q, 2, "str \"label\"...", "5", 0);
 }
+
+void test_this_query_because(struct testoasterror* test) {
+  test_query(test, "label food with color #e74c3c", 1, "#e74c3c", 0);
+}
+
