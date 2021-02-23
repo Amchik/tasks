@@ -1,6 +1,7 @@
 #ifndef _THTASKSRC
 #define _THTASKSRC
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -39,6 +40,9 @@ struct rcparseresult {
   struct rcstatement statement;
   // Error
   struct rcparseerror error;
+
+  // Line
+  char* query;
 };
 
 // Result of parsing file
@@ -46,6 +50,8 @@ struct rcfile {
   // Statements, pointer can be zero
   // if line is empty
   struct rcparseresult** result;
+  // Count of lines
+  unsigned int length;
 };
 
 // TaskRC line [OBSOLETE]
@@ -59,6 +65,6 @@ bool rchastype(const char* type);
 bool rchasparam(const char* param, const char* type);
 
 struct rcparseresult rcparseln(const char* data, size_t* n);
-struct rcfile rcparselns(const char* data, size_t offset);
+struct rcfile rcparselns(FILE* data, size_t offset);
 
 #endif

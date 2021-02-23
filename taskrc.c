@@ -24,6 +24,10 @@ static char* rctypes[] = {
 char _readchc(const char* data, size_t* n) {
   return(data[(*n)++]);
 }
+char _readchfp(FILE* fp, size_t* n) {
+  fsetpos(fp, (fpos_t*)n);
+  return(fgetc(fp));
+}
 
 // --- IMPLEMENTATION ---
 
@@ -166,11 +170,9 @@ struct rcstatementlist* prslst_old(void* data, size_t* n,
     // i have no idea how it work...
     // upd: it not work, um..., todo: create issue about it, when
     //  it throw segfault... um...
-    if (_vlen == (*n - on - 1)) {
-      if (value[_vlen - 1] == ',') {
-        value[_vlen - 1] = 0;
-        hasDelim = true;
-      }
+    if (_vlen == (*n - on - 1) && value[_vlen - 1] == ',') {
+      value[_vlen - 1] = 0;
+      hasDelim = true;
     } else {
       c = skipwh(data, n, readch, false);
       if (c == ',') {
@@ -226,7 +228,7 @@ void _formres(struct rcparseresult* res, struct rcparseerror* err) {
 
 struct rcparseresult _rcparseln(void* data, size_t* n, 
     char (*readch) (void* obj, size_t* n), bool typecheck) {
-  struct rcparseresult res = {0,0};
+  struct rcparseresult res = {.error = {0,0,0}, .statement = {0,0,0}, .query = 0};
   struct rcparseerror err = {0,0,0};
   //struct rcstatement* stm = malloc(sizeof(*stm));
   //ans.statement = stm;
@@ -313,5 +315,47 @@ struct rcparseresult _rcparseln(void* data, size_t* n,
 struct rcparseresult rcparseln(const char* data, size_t* n) {
   return(_rcparseln((void*)data, n, (char (*) (void* a1, size_t* a2))_readchc, true));
 }
-//struct rcline* rcparselns(const char* data, size_t offset);
+
+#define LNS_JUMP 8
+#define LNS_MAX  1024
+
+struct rcfile rcparselns(FILE* data, size_t offset) {
+  struct rcfile file = {0,0};
+  size_t n2 = offset;
+  int max = LNS_JUMP;
+  int curr = 0;
+  file.result = malloc(max * sizeof(struct rcparseresult*));
+  char* str;
+  while (getline(&str, &n2, data) != -1) {
+    size_t ln = strlen(str);
+    if (str[ln - 1] == '\n') str[ln - 1] = 0;
+    size_t n = 0;
+    struct rcparseresult res = 
+      rcparseln(str, &n);
+    struct rcparseresult* ptr = malloc(sizeof(*ptr));
+    memcpy(ptr, &res, sizeof(*ptr));
+    ptr->query = malloc(ln + 1);
+    memcpy(ptr->query, str, ln);
+    ptr->query[ln] = 0;
+    if (res.error.code && res.error.cstart == 0) {
+      ptr = 0;
+    }
+    if (curr + 1 >= max) {
+      if (max + LNS_JUMP >= LNS_MAX) {
+        // umm...
+        puts("!!! EMERGENCY EXIT !!! rcparselns: "
+            "file cannot contains great than LNS_MAX lines.");
+        exit(255);
+        return(file);
+      }
+      max += LNS_JUMP;
+      file.result = realloc(file.result,
+          max * sizeof(struct rcparseresult*));
+    }
+    *(file.result + curr) = ptr;
+    curr++;
+  }
+  file.length = curr;
+  return(file);
+}
 
