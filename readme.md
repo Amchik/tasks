@@ -2,11 +2,11 @@
 
 ~~-- simple todo manager.~~
 
-Completed on ~7.17%.
+Completed on -13%.
 
 ## Features (now)
 
-Parsing config queryies (taskrc):
+Parsing config files (taskrc):
 
 Syntax: `<type> <primary> [with <<param> <value>>[, <param> <value>]... [and <param> <value>]] [post]`.
 
