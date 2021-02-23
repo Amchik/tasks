@@ -4,7 +4,7 @@ obj = $(src:.c=.o)
 testsrc = $(wildcard tests/*.c) $(wildcard tests/testoasterror/src/*.c)
 testobj = $(testsrc:.c=.o)
 
-CFLAGS += -Wall
+CFLAGS += -Wall -Wextra
 
 tasks: $(obj)
 	$(CC) -o $@ $^ $(LDFLAGS)

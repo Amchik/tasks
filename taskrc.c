@@ -121,6 +121,9 @@ MLFC:
     }
     c = readch(data, n);
   }
+  if (sn == 0) {
+    goto MLFC;
+  }
   // haha, you read this... umm...
   // pls double press Page Down
   if (q) (*n)++;
@@ -296,8 +299,10 @@ struct rcparseresult _rcparseln(void* data, size_t* n,
   if (!post) {
     // TYPE PRIMARY with KEY VALUE, KEY VALUE and KEY VALUE POST
     //                                                      ^~~~
-    c = skipwh(data, n, readch, true);
+    (*n)++;
+    c = skipwh(data, n, readch, false);
     if (!mlfchar(c)) {
+      *n -= 2;
       err.cstart = *n;
       post = prsstr(data, n, readch, true);
     }
