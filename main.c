@@ -1,3 +1,4 @@
+#include "include/cli.h"
 #ifndef __HAS_TEST_EXECUTABLE
 
 #include <stdio.h>
@@ -44,7 +45,25 @@ void prinres(char* q, struct rcparseresult res) {
   }
 }
 
+void hndl(cliarg_t* arg) {
+  printf("In handler of (%s)\n", arg->token);
+  printf("Current argument (%s)", arg->argument);
+  arg->nextarg(arg);
+  printf(", next (%s)\n\n", arg->argument);
+}
+
 int main(int argc, char** argv) {
+  struct cliargs args[] = {
+    cliargs("hello", hndl, -1),
+    {0,0,0}
+  };
+  if (!cliexecuteall(args, argc - 1, argv + 1)) {
+    puts(":mda:");
+  } else {
+    puts("yyaaa");
+  }
+  return(0);
+
   /*char* q = calloc(1, 1);
   for (int i = 1; i < argc; i++) {
     char* tmp = strapnd(q, argv[i]);
