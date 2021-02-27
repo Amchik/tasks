@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 #include "table.h"
+#include "taskrc.h"
 
 // Task label
 struct Label {
@@ -25,6 +26,17 @@ struct Task {
   bool completed;
 };
 
+// United Task and Label array
+struct TaskRcContents {
+  struct Task** tasks;
+  struct Label** labels;
+  struct rcparseresult** results;
+
+  unsigned int length;
+};
+
+static const struct Label NOLABEL = { .name = "", .color = {0,0,0} };
+
 // Creates Label
 struct Label createLabel(const char* name, struct color color);
 
@@ -32,5 +44,7 @@ struct Label createLabel(const char* name, struct color color);
 struct Task createTask(unsigned int id, const char* description, struct Label label, int priority);
 // Converts Task to struct row
 struct row* Tasktorow(struct Task task);
+
+struct TaskRcContents parseTaskRc(FILE* stream);
 
 #endif

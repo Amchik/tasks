@@ -80,6 +80,14 @@ size_t tablelen(struct table* table) {
 
 // --- DRAWING ---
 
+void _printclr(FILE* fp, struct color color) {
+  if (*(unsigned long*)(void*)&color == 0) {
+    fprintf(fp, "  ");
+    return;
+  }
+  fprintf(fp, "\e[48;2;%u;%u;%um \e[0m ", color.red, color.green, color.blue);
+}
+
 void _printrow
 (bool printNum, int n, int numbericlen, int rowsc, const int* rowslen, const struct row* row, int clrBefore, FILE* fp) {
   if (!printNum) {
@@ -87,7 +95,7 @@ void _printrow
     if (clrBefore == -1) fprintf(fp, "  ");
   } else {
     if (clrBefore == -1)
-      fprintf(fp, "\e[48;2;%u;%u;%um \e[0m ", row->color.red, row->color.green, row->color.blue);
+      _printclr(fp, row->color);
     fprintf(fp, "#%u", n);
     int nlen = strlen(itoa(n));
     for(int j = 0; j < (numbericlen - nlen + 1); j++) putc(' ', fp);
@@ -95,7 +103,7 @@ void _printrow
   for(int i = 0; i < rowsc; i++) {
     if (i == clrBefore) {
       if (printNum)
-        fprintf(fp, "\e[48;2;%u;%u;%um \e[0m ", row->color.red, row->color.green, row->color.blue);
+        _printclr(fp, row->color);
       else
         fprintf(fp, "  ");
     }
