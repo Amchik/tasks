@@ -140,14 +140,20 @@ void ontable(cliarg_t* arg) {
 
 int main(int argc, char** argv) {
   zarg = argv[0];
+  if (argc == 1) {
+    warn("No arguments passed. Exiting with error code 1");
+    return(1);
+  }
   struct cliargs args[] = {
     cliargs("taskrc", onparsetaskrc, 1),
     cliargs("table", ontable, 1),
     cliargs("diagnostic", ondiagnostic, 1),
     {0,0,0}
   };
-  cliexecuteall(args, argc - 1, argv + 1);
-  return(0);
+  bool res = cliexecuteall(args, argc - 1, argv + 1);
+  if (!res)
+    warn("Syntax failture: please see readme.md");
+  return(!res);
 }
 
 #endif

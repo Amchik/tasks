@@ -1,16 +1,29 @@
+Not completed yet.
+
 # Amchik/tasks
 
-~~-- simple todo manager.~~
+... — simple To-Do manager.
 
-Completed on -13%.
+## Usage
 
-## Features (now)
+At commit 6a74ce you can parse taskrc and
+print it as table.
 
-Parsing config files (taskrc):
+* `taskrc <file>` - Full analyze of file
+* `table <file>` - Print table of file
+* `diagnostic <file>` - Analyze only errors
+
+### TaskRC
 
 Syntax: `<type> <primary> [with <<param> <value>>[, <param> <value>]... [and <param> <value>]] [post]`.
 
-Examples:
+For type `task` you can change `label` and `priority`. Label must be exists, `priority`
+must be integer. Set post to `"completed"` for complete task.
+
+For type `label` you can change only color in format `#HHHHHH`, where `H`
+— hex digit. Note: color `#000000` will not been print.
+
+#### Examples
 
 ```
 task "Fix this \"todo manager\"" with label github and priority 0  
