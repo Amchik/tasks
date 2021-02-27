@@ -4,6 +4,8 @@ Not completed yet.
 
 ... — simple To-Do manager.
 
+![https://i.imgur.com/78rYO9r.png](https://i.imgur.com/78rYO9r.png)
+
 ## Usage
 
 At commit 6a74ce you can parse taskrc and

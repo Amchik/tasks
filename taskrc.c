@@ -364,3 +364,28 @@ struct rcfile rcparselns(FILE* data, size_t offset) {
   return(file);
 }
 
+char* rcprsgeterrordesc(unsigned int code) {
+  if (code == 0)
+    return "No errors.";
+  switch (code) {
+    case 101:
+    case 181:
+    case 201:
+      return "String parse error: too big string.";
+    case 102:
+    case 182:
+    case 202:
+      return "String parse error: unexpected \\0, \\n or EOF.";
+
+    case 121:
+      return "Type error: unkown type.";
+
+    case 161:
+      return "Type error: unknown param in type.";
+    case 162:
+      return "List parse error: to many params.";
+    case 163:
+      return "Syntax error: expected 'and'";
+  }
+  return "Unknown error occured: may memory issue.";
+}

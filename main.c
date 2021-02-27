@@ -41,8 +41,8 @@ void ondiagnostic(cliarg_t* arg) {
       count++;
       char* q = UNKNOWN;
       if (res->query) q = res->query;
-      printf("\e[1;31merror\e[0;1m:%u:%u-%u:\e[0m [%u] No description.\n %3d | %s\n     | \e[1;31m", 
-          i + 1, res->error.cstart, res->error.cend, res->error.code, i + 1,
+      printf("\e[1;31merror\e[0;1m:%u:%u-%u:\e[0m [%u] %s\n %3d | %s\n     | \e[1;31m", 
+          i + 1, res->error.cstart, res->error.cend, res->error.code, rcprsgeterrordesc(res->error.code), i + 1,
           q);
       if (res->error.cstart <= res->error.cend) {
         for(int i = 0; i < res->error.cstart; i++) putc(' ', stdout);

@@ -67,4 +67,6 @@ bool rchasparam(const char* param, const char* type);
 struct rcparseresult rcparseln(const char* data, size_t* n);
 struct rcfile rcparselns(FILE* data, size_t offset);
 
+char* rcprsgeterrordesc(unsigned int code);
+
 #endif
