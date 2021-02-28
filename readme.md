@@ -41,5 +41,3 @@ label food   with color #e74c3c
 For build main executeable type `make`,
 or for build unit tests type `make test` (`make check` - run unit tests).
 
-Note: for build unit tests after main executable remove file `main.o`.
-
