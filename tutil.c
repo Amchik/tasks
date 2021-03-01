@@ -48,7 +48,7 @@ char* formT(struct Task task) {
 char* formL(struct Label label) {
   char* q = calloc(1024, 1);
   char* name = getsafestr(label.name);
-  sprintf(q, "label \"%s\" with color #%lX", name, *(unsigned long*)&label.color);
+  sprintf(q, "label \"%s\" with color #%.6lX", name, rgbl(label.color));
   free(name);
   return(q);
 }
@@ -80,8 +80,7 @@ void rcfileeditln(struct TaskRcContents* taskrc, FILE* fp,
   // TODO: comment
   fseek(fp, 0, SEEK_END);
   unsigned long fsize = ftell(fp);
-  unsigned long pos = 0;
-  fsetpos(fp, &pos);
+  fseek(fp, 0, SEEK_SET);
   unsigned int ln = 1;
   size_t offset = 0, offset2 = 0;
   while (ln < line) {
@@ -99,14 +98,12 @@ void rcfileeditln(struct TaskRcContents* taskrc, FILE* fp,
     offset2++;
     ln++;
   }
-  pos = offset2;
-  fsetpos(fp, &pos);
   size_t datalen = fsize - offset2;
   char* dataend = malloc(datalen + 1);
+  fseek(fp, offset2, SEEK_SET);
   fread(dataend, datalen, 1, fp);
   dataend[datalen] = 0;
-  pos = offset;
-  fsetpos(fp, &pos);
+  fseek(fp, offset, SEEK_SET);
   fputs(q, fp);
   fputc('\n', fp);
   fputs(dataend, fp);
@@ -119,6 +116,7 @@ void rcfileeditln(struct TaskRcContents* taskrc, FILE* fp,
   }
   // --
   free(q);
+  free(dataend);
 }
 
 // Returns error code, 0 - no error.

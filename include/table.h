@@ -56,6 +56,8 @@ struct table* __createtable(int n, struct row masterrow, ...);
 struct color  rgb(unsigned char red, unsigned char green, unsigned char blue);
 // Create new color structure by number, ex 0xff12ff
 struct color  rgbi(unsigned long number);
+// Convert color to unsigned long
+unsigned long rgbl(struct color color);
 
 // Extends a row, where newsize is elements count
 void extendrow(struct row* row, size_t newsize);

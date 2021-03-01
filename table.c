@@ -55,6 +55,14 @@ struct color  rgb(unsigned char red, unsigned char green, unsigned char blue) {
 struct color  rgbi(unsigned long number) {
   return(*(struct color*)(void*)&number);
 }
+// Convert color to unsigned long
+unsigned long rgbl(struct color color) {
+  unsigned long ans = 0;
+  ans += color.red << 16;
+  ans += color.green << 8;
+  ans += color.blue;
+  return(ans);
+}
 
 // Extends a row, where newsize is elements count
 void extendrow(struct row* row, size_t newsize) {
