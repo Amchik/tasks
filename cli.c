@@ -50,7 +50,6 @@ bool cliexecuteall(struct cliargs* args, int argc, char** argv) {
       .base = {
         .token = token,
         .argument = carg,
-        .nextarg = clinextarg,
       },
       .__argsleft = argc - 1 - n,
       .__argv = argv + n + 1,

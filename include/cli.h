@@ -9,8 +9,6 @@ typedef struct __cliarg_e cliarg_t;
 struct __cliarg_e {
   char* token;
   char* argument;
-
-  void (*nextarg)(cliarg_t* self);
 };
 
 // CLI argument
