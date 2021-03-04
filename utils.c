@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#ifdef _THUTILS_INCLUDE_USELESS_FUNCTIONS
+
 #define _GET_PNAME_PBEGIN "/proc/"
 #define _GET_PNAME_PEND "/comm"
 
@@ -23,7 +25,7 @@ char* read_file(const char* filename) {
   return(string);
 }
 
-char* get_pname(pid_t pid) {
+char* get_pname(unsigned int pid) {
   char* _spid = calloc(12, sizeof(char));
   sprintf(_spid, "%u", pid);
   char* path = malloc(strlen(_GET_PNAME_PBEGIN _GET_PNAME_PEND) + 
@@ -43,7 +45,7 @@ char* get_pname(pid_t pid) {
 }
 
 // https://gist.github.com/Amchik/64e1c40bdd531a9fb09df6a2931cfda9
-pid_t getppidof(pid_t pid) {
+unsigned int getppidof(unsigned int pid) {
   char* spid = calloc(12, sizeof(char));
   sprintf(spid, "%u", pid);
   char* path = malloc(strlen(_GETPPIDOF_C_PBEGIN _GETPPIDOF_C_PEND) + 
@@ -62,7 +64,7 @@ pid_t getppidof(pid_t pid) {
   sppid = strtok(0, " ");     // getting ppid
   fclose(fp);
 
-  pid_t ppid = atoi(sppid);
+  unsigned int ppid = atoi(sppid);
   free(path);
   return(ppid);
 }
@@ -92,6 +94,8 @@ int strdlen(const char* string) {
   }
   return(dlen);
 }
+
+#endif
 
 char* strcapnd(char* original, char new) {
   size_t size;

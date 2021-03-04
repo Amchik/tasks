@@ -9,8 +9,7 @@ int main(int argc, char** argv) {
     warn("No arguments passed. Exiting with error code 1");
     return(1);
   }
-  struct cliargs* args = cliclient();
-  cliclientsetzarg(argv[0]);
+  struct cliargs* args = cliclient(argv[0]);
   bool res = cliexecuteall(args, argc - 1, argv + 1);
   if (!res)
     warn("Syntax failture: please see readme.md");

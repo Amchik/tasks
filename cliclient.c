@@ -25,10 +25,6 @@ void dowarn() {
   DOWARN = 0;
 }
 
-void cliclientsetzarg(char* value) {
-  zarg = value;
-}
-
 void _calcerrors(struct TaskRcContents rc) {
   unsigned int count = 0;
   for (unsigned int i = 0; i < rc.length; i++) {
@@ -118,7 +114,8 @@ void onuse(cliarg_t* args) {
   DOWARN -= DOWARN && 1;
 }
 
-struct cliargs* cliclient() {
+struct cliargs* cliclient(char* arg0) {
+  zarg = arg0;
   struct cliargs args[] = {
     cliargs("use",        onuse,        1),
     cliargs("table",      ontable,      0),

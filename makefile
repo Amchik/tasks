@@ -8,7 +8,7 @@ SOURCES_TEST = $(wildcard tests/*.c tests/testoasterror/src/*.c)
 OBJECTS 		 = $(patsubst %.c,$(OBJ)/%.o,$(SOURCES))
 OBJECTS_TEST = $(patsubst %.c,$(OBJ)/%.o,$(SOURCES_TEST))
 
-CFLAGS += -Wall -Wextra -std=gnu99 -D_THUTILS_INCLUDE_USELESS_FUNCTIONS
+CFLAGS += -Wall -Wextra -std=c99 -D_THUTILS_INCLUDE_USELESS_FUNCTIONS
 
 $(OBJ)/%.o: %.c
 	@echo -e "\e[1mBuilding \e[4m$@\e[0m"
