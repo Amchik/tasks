@@ -4,16 +4,18 @@ Not completed yet.
 
 ... — simple To-Do manager.
 
-![https://i.imgur.com/78rYO9r.png](https://i.imgur.com/78rYO9r.png)
+![https://i.imgur.com/fXXvUoV.png](https://i.imgur.com/fXXvUoV.png)
 
 ## Usage
 
-At commit 6a74ce you can parse taskrc and
+At commit a8ae43ee2028d7f89d48b6661400187929cc7ac5 you can parse taskrc and
 print it as table.
 
-* `taskrc <file>` - Full analyze of file
-* `table <file>` - Print table of file
-* `diagnostic <file>` - Analyze only errors
+* `table` - Print table of file
+* `diagnostic` - Analyze only errors
+* `use <file>` - Change current file
+
+By defaults uses `Tasksfile` and `~/.taskrc`
 
 ### TaskRC
 
@@ -38,6 +40,7 @@ label food   with color #e74c3c
 
 ## Building
 
-For build main executeable type `make`,
-or for build unit tests type `make test` (`make check` - run unit tests).
+For build main executeable type `make`.
+
+For run unit tests use `make check`.
 
