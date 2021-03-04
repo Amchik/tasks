@@ -3,14 +3,14 @@ NAME_TEST = test
 BIN = bin
 OBJ = obj
 
-SOURCES 		 = $(wildcard *.c)
+SOURCES 		 = $(wildcard src/*.c)
 SOURCES_TEST = $(wildcard tests/*.c tests/testoasterror/src/*.c)
-OBJECTS 		 = $(patsubst %.c,$(OBJ)/%.o,$(SOURCES))
+OBJECTS 		 = $(patsubst src/%.c,$(OBJ)/%.o,$(SOURCES))
 OBJECTS_TEST = $(patsubst %.c,$(OBJ)/%.o,$(SOURCES_TEST))
 
-CFLAGS += -Wall -Wextra -std=c99 -D_THUTILS_INCLUDE_USELESS_FUNCTIONS
+CFLAGS += -Wall -Wextra -std=c99 -D_THUTILS_INCLUDE_USELESS_FUNCTIONS -I.
 
-$(OBJ)/%.o: %.c
+$(OBJ)/%.o: src/%.c
 	@echo -e "\e[1mBuilding \e[4m$@\e[0m"
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -c -o $@ $<
