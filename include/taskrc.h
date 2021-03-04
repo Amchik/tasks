@@ -25,7 +25,8 @@ struct rcstatement {
 
 // Describes parsing error
 struct rcparseerror {
-  // Error code (see todo.com for more info)
+  // Error code
+  // Use rcprsgeterrordesc(code) for get description.
   unsigned int code;
 
   // # of start char
@@ -61,12 +62,17 @@ struct rcline {
   struct rcstatement* statement;
 };
 
+// Has type exists?
 bool rchastype(const char* type);
+// Has param exists in type and has type exists?
 bool rchasparam(const char* param, const char* type);
 
+// Parse one line
 struct rcparseresult rcparseln(const char* data, size_t* n);
+// Parse file
 struct rcfile rcparselns(FILE* data, size_t offset);
 
+// Get description for error code.
 char* rcprsgeterrordesc(unsigned int code);
 
 #endif

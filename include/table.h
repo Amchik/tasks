@@ -48,10 +48,10 @@ struct table {
 
 // Create new row by color and records.
 // Usage: createrow(color, record1, record2...)
-struct row*   __createrow(int n, struct color color, ...);
+struct row*   __createrow(int __nrecords, struct color color, ...);
 // Create new table by master row and rows.
 // Usage: createtable(masterrow, row1, row2...)
-struct table* __createtable(int n, struct row masterrow, ...);
+struct table* __createtable(int __nrows, struct row masterrow, ...);
 // Create new color structure by red, green and blue
 struct color  rgb(unsigned char red, unsigned char green, unsigned char blue);
 // Create new color structure by number, ex 0xff12ff
@@ -63,10 +63,10 @@ unsigned long rgbl(struct color color);
 void extendrow(struct row* row, size_t newsize);
 
 // Return length of records array.
-// Array must be ends with 0, read strlen(3)
+// Array must be ends with 0 ({0,0}), like strlen
 size_t rowlen(struct row* row);
 // Returns length of rows array
-// Array must be ends with 0, read strlen(3)
+// Array must be ends with 0 ({0,0,0}), like strlen
 size_t tablelen(struct table* table);
 
 // --- DRAWING ---

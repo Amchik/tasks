@@ -6,8 +6,12 @@
 
 // Argument object.
 typedef struct __cliarg_e cliarg_t;
+// Argument object.
 struct __cliarg_e {
+  // Argument token AKA name.
   char* token;
+  // Current argument, change it by calling clinextarg()
+  // If arguments ended this property will be set to NULL.
   char* argument;
 };
 
@@ -17,7 +21,8 @@ struct cliargs {
   char* token;
   // Extra arguments count. Use zero for disable.
   // Example of usage: TOKEN1 ARG1 TOKEN2... -- for arg TOKEN1 extra = 1.
-  // Use -1 for unexpected count of extra arguments, changing the pointer will be affect to real pointer.
+  // Use -1 for unexpected count of extra arguments.
+  // For go to next argument call clinextarg() by cliarg_t
   char extra;
 
   void (*handler)(cliarg_t* cliarg);
