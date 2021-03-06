@@ -30,6 +30,7 @@ For type `label` you can change only color in format `#HHHHHH`, where `H`
 #### Examples
 
 ```
+# Comment!
 task "Fix this \"todo manager\"" with label github and priority 0  
 task "Make a soup"               with label food   ,   priority 10 completed
 task "Go to a shop"              completed

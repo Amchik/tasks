@@ -324,6 +324,10 @@ struct rcparseresult rcparseln(const char* data, size_t* n) {
 #define LNS_JUMP 8
 #define LNS_MAX  1024
 
+void _strtrim(char* str, size_t* start) {
+  for(*start = 0; str[*start] == ' '; (*start)++);
+}
+
 struct rcfile rcparselns(FILE* data, size_t offset) {
   struct rcfile file = {0,0};
   size_t n2 = offset;
@@ -332,19 +336,28 @@ struct rcfile rcparselns(FILE* data, size_t offset) {
   file.result = malloc(max * sizeof(struct rcparseresult*));
   char* str;
   while (getline(&str, &n2, data) != -1) {
+    struct rcparseresult* ptr = malloc(sizeof(*ptr));
+
+    size_t trimmed;
+    _strtrim(str, &trimmed);
+    if (mlfchar(str[trimmed]) || str[trimmed] == '#') {
+      ptr = 0;
+      goto SKIPPRS;
+    }
+
     size_t ln = strlen(str);
     if (str[ln - 1] == '\n') str[ln - 1] = 0;
     size_t n = 0;
     struct rcparseresult res = 
       rcparseln(str, &n);
-    struct rcparseresult* ptr = malloc(sizeof(*ptr));
     memcpy(ptr, &res, sizeof(*ptr));
     ptr->query = malloc(ln + 1);
     memcpy(ptr->query, str, ln);
     ptr->query[ln] = 0;
-    if (res.error.code && res.error.cstart == 0) {
-      ptr = 0;
-    }
+    //if (res.error.code && res.error.cstart == 0) {
+    //  ptr = 0;
+    //}
+SKIPPRS:
     if (curr + 1 >= max) {
       if (max + LNS_JUMP >= LNS_MAX) {
         // umm...
