@@ -388,10 +388,10 @@ char* rcprsgeterrordesc(unsigned int code) {
     case 102:
     case 182:
     case 202:
-      return "String parse error: unexpected \\0, \\n or EOF.";
+      return "String parse error: unexpected end.";
 
     case 121:
-      return "Type error: unkown type.";
+      return "Type error: unknown type.";
 
     case 161:
       return "Type error: unknown param in type.";
