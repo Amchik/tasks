@@ -15,3 +15,16 @@ jobs:
         make
     - name: make check
       run: make check
+  
+  build-arm64:
+  
+    runs-on: aarch64-runner
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: make
+      run: |
+        git submodule update --init --recursive
+        make
+    - name: make check
+      run: make check
