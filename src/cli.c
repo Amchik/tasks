@@ -22,6 +22,16 @@ struct cliargs cliargs(char* token, void (*handler)(cliarg_t* cliarg), char extr
   return(object);
 }
 
+static clierror_t CLIWHEREERROR = {
+  .position = 0,
+  .token = 0
+};
+
+// Get error
+clierror_t cligeterror() {
+  return(CLIWHEREERROR);
+}
+
 struct cliargs* _findarg(struct cliargs* args, const char* token) {
   struct cliargs* curr = args;
   while (true) {
@@ -39,6 +49,8 @@ bool cliexecuteall(struct cliargs* args, int argc, char** argv) {
   for (;n < argc; ++n) {
     char* token = argv[n];
     char* carg = 0;
+    CLIWHEREERROR.token = token;
+    CLIWHEREERROR.position = n; 
     struct cliargs* arg = _findarg(args, token);
     if (!arg)
       return(false);

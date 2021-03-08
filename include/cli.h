@@ -28,12 +28,23 @@ struct cliargs {
   void (*handler)(cliarg_t* cliarg);
 };
 
+typedef struct {
+  // Argument token AKA name.
+  char* token;
+  // Position
+  unsigned int position;
+} clierror_t;
+
 // CLI argument
 struct cliargs cliargs(char* token, void (*handler)(cliarg_t* cliarg), char extra);
+
+// Get error
+clierror_t cligeterror();
 
 // Execute all arguments
 bool cliexecuteall(struct cliargs* args, int argc, char** argv);
 
+// Go to next argument
 void clinextarg(cliarg_t* self);
 
 #endif

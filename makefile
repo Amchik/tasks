@@ -20,7 +20,6 @@ $(BIN)/$(NAME): $(OBJECTS)
 	@mkdir -p $(@D)
 	@$(CC) $(LDFLAGS) -o $@ $^
 
-$(BIN)/$(NAME_TEST): export CFLAGS+= -D__HAS_TEST_EXECUTABLE
 $(BIN)/$(NAME_TEST): $(filter-out $(OBJ)/main.o,$(OBJECTS)) $(OBJECTS_TEST)
 	@echo -e "\e[1mLinking \e[4m$@\e[0m"
 	@mkdir -p $(@D)
