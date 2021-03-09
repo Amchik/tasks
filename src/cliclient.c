@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -32,10 +33,104 @@ void _calcerrors(struct TaskRcContents rc) {
       count++;
   }
   if (count) {
-    warn("While parsing taskrc found %u errors. Run \e[1m%s [use %s] diagnostic\e[0m"
+    warn("While parsing taskrc found %u errors. Run \e[1m%s \e[3m[use %s]\e[0;1m diagnostic\e[0m"
         " for more information.",
         count, zarg, CURRENT_FILE);
   }
+}
+
+// _findtype(content-
+int _fndtp(const struct TaskRcContents* cntnt, char* type, char* primary) {
+  for(int i = 0; i < (int)cntnt->length; i++) {
+    if (cntnt->results[i] != 0 && 
+        cntnt->results[i]->error.code == 0 &&
+        strcmp(type, cntnt->results[i]->statement.type) == 0 &&
+        strcmp(primary, cntnt->results[i]->statement.primary) == 0)
+      return i;
+  }
+  return(-1);
+}
+
+int _clcwhtedt(char* type, char* toedit) {
+  bool task = !strcmp(type, "task");
+  bool labl = !strcmp(type, "label");
+  if (strcmp(toedit, "primary") == 0) {
+    return(1 + labl);
+  } else if (strcmp(toedit, "post") == 0) {
+    return(3 + labl);
+  } else if (task && strcmp(toedit, "label") == 0) {
+    return(11);
+  } else if (task && strcmp(toedit, "priority") == 0) {
+    return(12);
+  } else if (task && strcmp(toedit, "status") == 0) {
+    return(13);
+  } else if (labl && strcmp(toedit, "color") == 0) {
+    return(21);
+  }
+  return(-1);
+}
+
+void oneditln(cliarg_t* arg) {
+  char* type = arg->argument;
+  clinextarg(arg);
+  char* prim = arg->argument;
+  FILE* fp = fopen(CURRENT_FILE, "r+");
+  if (!fp) {
+    error("todo move it into function aaa. fp == 0");
+    exit(255);
+  }
+  struct TaskRcContents cntnt = parseTaskRc(fp);
+  fseek(fp, 0, SEEK_SET);
+  int where = _fndtp(&cntnt, type, prim);
+  if (where == -1) {
+    error("Record \"%s\" of type %s not found.", prim, type);
+    exit(4);
+  }
+  clinextarg(arg);
+  char* toedit = arg->argument;
+  clinextarg(arg);
+  char* withedit = arg->argument;
+  int whatedit = _clcwhtedt(type, toedit);
+  if (whatedit == -1) {
+    error("Unknown param to edit. Avalibe: 1, 2, 11, 12, 13, 21");
+  }
+  switch(whatedit) {
+    case 1:
+      cntnt.tasks[where]->description = withedit;
+      break;
+    case 2:
+      cntnt.labels[where]->name = withedit;
+      break;
+    case 3:
+      warn("Unsupported action 'post' for type 'task'. Please use complete in future.");
+      goto TASKPOST;
+      break;
+    case 4:
+      warn("Unsupported action 'post' for type 'task'. Skipping...");
+      break;
+    case 11:
+      {
+        int wl = _fndtp(&cntnt, "label", withedit);
+        if (wl == 0) 
+          warn("No label %%%s found. Skipping...", withedit);
+        else
+          cntnt.tasks[where]->label = *cntnt.labels[wl];
+      }
+      break;
+    case 12:
+      cntnt.tasks[where]->priority = atoi(withedit);
+      break;
+    case 13:
+TASKPOST:
+      cntnt.tasks[where]->completed = strcmp(withedit, "yes") == 0;
+      break;
+    case 21:
+      withedit++;
+      cntnt.labels[where]->color = rgbi(strtol(withedit, 0, 16));
+      break;
+  }
+  rcfileeditln(&cntnt, fp, where + 1);
+  fclose(fp);
 }
 
 void ondiagnostic(cliarg_t* arg) {
@@ -120,6 +215,7 @@ struct cliargs* cliclient(char* arg0) {
     cliargs("use",        onuse,        1),
     cliargs("table",      ontable,      0),
     cliargs("diagnostic", ondiagnostic, 0),
+    cliargs("edit",       oneditln,     4),
     {0,0,0}
   };
   struct cliargs* _ = malloc(sizeof(args));
