@@ -81,7 +81,25 @@ void oneditln(cliarg_t* arg) {
   }
   struct TaskRcContents cntnt = parseTaskRc(fp);
   fseek(fp, 0, SEEK_SET);
-  int where = _fndtp(&cntnt, type, prim);
+  int where = -1;
+  if (strcmp("task", type) == 0 && *prim == '@') {
+    prim++;
+    int _no = atoi(prim);
+    if (_no <= 0) {
+      prim--;
+    } else {
+      unsigned lste = 0, ce = 0;
+      for(where = 0; where < (int)cntnt.length; where++) {
+        if (cntnt.tasks[where] != 0) {
+          ce++;
+          lste = where;
+          if (ce == (unsigned int)_no) break;
+        }
+      }
+      where = lste;
+    }
+  }
+  if (where == -1) where = _fndtp(&cntnt, type, prim);
   if (where == -1) {
     error("Record \"%s\" of type %s not found.", prim, type);
     exit(4);
