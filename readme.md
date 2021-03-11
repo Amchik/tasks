@@ -14,8 +14,11 @@ print it as table.
 * `table` - Print table of file
 * `diagnostic` - Analyze only errors
 * `use <file>` - Change current file
+* `edit <type> <primary key or @NUM for task type> <key> <value>`
 
 By defaults uses `Tasksfile` and `~/.taskrc`
+
+Running without arguments equals passing only `table`.
 
 ### TaskRC
 
@@ -38,6 +41,41 @@ task "Go to a shop"              completed
 label github 
 label food   with color #e74c3c
 ```
+
+#### Editing via `edit`
+
+Syntax: `executable edit <type> <prim> <key> <value>`
+
+For type `task` `prim` can be formatted as `@N`, where `N` -
+number of task in table.
+
+**NOTE:** if edit file from `a` bytes to `b` bytes, where `a > b` in end
+of file will be writes with `a - b - 1` zero bytes.
+
+##### Base
+
+| Key | Description | Notes |
+|-----|-------------|-------|
+|`primary`| Primary value of query | |
+|`post`| Post value of query | Cannot be used in `label`. In `task` it will be redirected to `status` |
+
+##### `task`
+
+| Key | Description | Notes |
+|-----|-------------|-------|
+|`label`| Label of task | Label must been exists. Cannot be change to none (not implented). |
+|`priority`| Priority of task | _May be_ if not a number priority will sets to zero |
+|`status`| Completion status | `yes` - completed, another - not completed (bug). |
+
+For edit description use `primary`.
+
+##### `label`
+
+For edit name use `primary`.
+
+| Key | Description | Notes |
+|-----|-------------|-------|
+|`color`| Color of label | Must be formatted as `#HHHHHH` |
 
 ## Building
 
