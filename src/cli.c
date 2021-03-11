@@ -51,11 +51,14 @@ bool cliexecuteall(struct cliargs* args, int argc, char** argv) {
     char* carg = 0;
     CLIWHEREERROR.token = token;
     CLIWHEREERROR.position = n; 
+    CLIWHEREERROR.addit = -1;
     struct cliargs* arg = _findarg(args, token);
     if (!arg)
       return(false);
-    if (arg->extra > 0 && argc - 1 - n < arg->extra)
+    if (arg->extra > 0 && argc - 1 - n < arg->extra) {
+      CLIWHEREERROR.addit = argc - 1 - n;
       return(false);
+    }
     if (arg->extra != 0) 
       carg = argv[++n];
     struct __cliarg targ = {
@@ -68,6 +71,7 @@ bool cliexecuteall(struct cliargs* args, int argc, char** argv) {
     };
     arg->handler(&(targ.base));
     if (arg->extra == -1) n = argc - 1 - targ.__argsleft;
+    else if (arg->extra != 0) n += arg->extra - 1;
   }
   return(true);
 }

@@ -33,6 +33,8 @@ typedef struct {
   char* token;
   // Position
   unsigned int position;
+  // Additional arguments for token
+  int addit;
 } clierror_t;
 
 // CLI argument
