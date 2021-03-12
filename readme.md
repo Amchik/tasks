@@ -1,5 +1,3 @@
-Not completed yet.
-
 # Amchik/tasks
 
 ... — simple To-Do manager.
@@ -65,17 +63,17 @@ of file will be writes with `a - b - 1` zero bytes.
 |-----|-------------|-------|
 |`label`| Label of task | Label must been exists. Cannot be change to none (not implented). |
 |`priority`| Priority of task | _May be_ if not a number priority will sets to zero |
-|`status`| Completion status | `yes` - completed, another - not completed (bug). |
+|`status`| Completion status | `completed` - completed, another - not completed. |
 
 For edit description use `primary`.
 
 ##### `label`
 
-For edit name use `primary`.
-
 | Key | Description | Notes |
 |-----|-------------|-------|
 |`color`| Color of label | Must be formatted as `#HHHHHH` |
+
+For edit name use `primary`.
 
 ## Building
 
