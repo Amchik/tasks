@@ -1,0 +1,168 @@
+.TH TASKS 2 "March 13 2021" "Amchik" "User Commands"
+.SH NAME
+tasks \- Simple ToDo Manager
+.SH SYNOPSIS
+.B tasks
+.br
+.B tasks
+[\fI\,token [\fI\,argument\/\fR]...\/\fR]...
+.SH DESCRIPTION
+
+Tasks (Amchik/tasks) is a simple ToDo manager written
+in C99. Have own config (taskrc or Tasksfile) format,
+that simple and can be read without formatting.
+
+.TP
+.B "use" <\fI\,file\/\fR>
+.br
+Select a file to use. For select \fB\,~/.taskrc\/\fR
+instead \fB\,Tasksfile\/\fR (by default) use \fB\,%\/\fR.
+
+.TP
+.B "table"
+.br
+Prints a pretty table by the file.
+
+.TP
+.B "diagnostic"
+.br
+Show a errors in file.
+
+.TP
+.B "edit" <\fI\,type\/\fR> <\fI\,primary\/\fR> <\fI\,key\/\fR> <\fI\,value\/\fR> 
+.br
+Edit a record of type \fI\,type\/\fR with primary
+key \fI\,primary\/\fR. In type \fItask\fR you can
+pass \fB@\fINUM\fR, where NUM is number of task in
+table. See section \fBEDITING TASKRC\fR for more info.
+
+.TP
+.B "delete" <\fI\,type\/\fR> <\fI\,primary\/\fR>
+.br
+Edit a record of type \fI\,type\/\fR with primary
+key \fI\,primary\/\fR. Like \fBedit\fR in type
+\fItask\fR you can pass \fB@\fINUM\fR, where NUM
+is number of task in table.
+
+.PP
+
+Running tasks without arguments equals running with
+only \fBtable\fR argument.
+
+.SH TASKRC
+
+TaskRC are config type, using by tasks. By default tasks
+use \fBTasksfile\fR file in current directory, if it not
+exists using \fB~/.taskrc\fR
+
+.SS Syntax
+.EX
+<\fItype\fR> <\fIprimary\fR> [\fBwith\fR <<\fIkey\fR> <\fIvalue\fR>>[, <\fIkey\fR> <\fIvalue\fR>]... [\fBand\fR <\fIkey\fR> <\fIvalue\fR>]] [\fIpost\fR]
+.EE
+
+Type \fBtask\fR contains 2 keys: \fBlabel\fR and \fBpriority\fR.
+Set post to \fBcompleted\fR for complete task.
+
+Type \fBlabel\fR have only \fBcolor\fR key, formatted as
+\fB#HHHHHH\fR. Note: color #000000 will be not displayed.
+
+.SS Examples
+
+.EX
+# Comment!
+task "Fix this \\"todo manager\\"" with label github and priority 0  
+task "Make a soup"               with label food   ,   priority 10 completed
+task "Go to a shop"              completed
+
+label github 
+label food   with color #e74c3c
+.EE
+
+.SH EDITING TASKRC
+
+For type \fBtask\fR \fIprimary\fR can be formatted as
+\fB@\fIN\fR, where N - number of task in table.
+
+\fBNOTE\fR: if edit file from \fBa\fR bytes to
+\fBb\fR bytes, where \fBa > b\fR in end of file will
+be writes with \fBa - b - 1\fR zero bytes.
+
+.SS Base Keys
+
+.TP
+\fBprimary\fR \- Primary value of query
+.br
+
+.TP
+\fBpost\fR \- Post value of query
+.br
+Cannot be used in \fBlabel\fR. In \fBtask\fR it will be
+redirected to \fBstatus\fR.
+
+.SS Task Keys
+
+.TP
+\fBlabel\fR \- Label of task
+.br
+Label must been exists. Cannot be change to
+none (not implented).
+
+.TP
+\fBpriority\fR \- Priority of task
+.br
+May be if not a number priority will sets to zero.
+
+.TP
+\fBstatus\fR \- Completion status
+.br
+\fB"completed"\fR - completed, another - not completed.
+
+.PP
+
+For edit description use \fBprimary\fR.
+
+.SS Label Keys
+
+.TP
+\fBcolor\fR \- Color of label
+.br
+Must be formatted as \fB"#HHHHHH"\fR.
+
+.PP
+
+For edit name use \fBprimary\fR.
+
+.SH EXAMPLES
+
+.TP
+$ \fBtasks use % table diagnostic\fR
+.br
+Select file \fB~/.taskrc\fR, print table and
+show errors.
+
+.TP
+$ \fBtasks edit task @2 label github\fR
+.br
+Change label of task \fB#2\fR to \fBgithub\fR.
+
+.TP
+$ \fBtasks edit label cli color '#e4c4c7'\fR
+.br
+Change color of label \fBcli\fR to \fB#e4c4c7\fR.
+
+.TP
+$ \fBtasks delete task @45646\fR
+.br
+Hmm, if task \fB#45646\fR exists it will be deleted.
+Otherwise last task will be deleted.
+
+.SH AUTHOR AND COPYRIGHT
+
+Written by Amchik. Please, specify author <3.
+
+.SH BUGS
+
+Report found bugs here:
+<https://github.com/Amchik/tasks/issues>.
+Also you can report by email: <am4ik1337@gmail.com>
+or <chkrg@ceheki.org>, telegram: \fB@am4ik1337\fR.
