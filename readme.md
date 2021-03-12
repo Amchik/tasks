@@ -12,7 +12,8 @@ print it as table.
 * `table` - Print table of file
 * `diagnostic` - Analyze only errors
 * `use <file>` - Change current file
-* `edit <type> <primary key or @NUM for task type> <key> <value>`
+* `edit <type> <primary key or @NUM for task type> <key> <value>` - Edit record
+* `delete <type> <primary eky or @NUM for task type>` - Remove record
 
 By defaults uses `Tasksfile` and `~/.taskrc`
 

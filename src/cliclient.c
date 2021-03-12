@@ -115,11 +115,17 @@ void oneditln(cliarg_t* arg) {
     error("Record \"%s\" of type %s not found.", prim, type);
     exit(4);
   }
+  int whatedit = 0;
+  if (strcmp(arg->token, "delete") == 0) {
+    goto EDIT;
+  }
   clinextarg(arg);
   char* toedit = arg->argument;
   clinextarg(arg);
   char* withedit = arg->argument;
-  int whatedit = _clcwhtedt(type, toedit);
+  whatedit = _clcwhtedt(type, toedit);
+EDIT: // if arg->token == delete this cond always false
+  // hmm, may be it needs to fix?..
   if (whatedit == -1) {
     error("Unknown param to edit. Avalibe: 1, 2, 11, 12, 13, 21");
   }
@@ -127,6 +133,10 @@ void oneditln(cliarg_t* arg) {
   LNTOCHANGE[0] = where + 1;
   size_t LNTOCHANGEnext = 1;
   switch(whatedit) {
+    case 0:
+      cntnt.tasks[where] = 0;
+      cntnt.labels[where] = 0;
+      break;
     case 1:
       cntnt.tasks[where]->description = withedit;
       break;
@@ -254,6 +264,7 @@ struct cliargs* cliclient(char* arg0) {
     cliargs("table",      ontable,      0),
     cliargs("diagnostic", ondiagnostic, 0),
     cliargs("edit",       oneditln,     4),
+    cliargs("delete",     oneditln,     2),
     {0,0,0}
   };
   struct cliargs* _ = malloc(sizeof(args));
