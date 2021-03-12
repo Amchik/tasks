@@ -70,13 +70,13 @@ void rcfileappndtsk(FILE* fp, struct Task task) {
 void rcfileeditln(struct TaskRcContents* taskrc, FILE* fp,
     unsigned int line) {
   char* q = 0;
-  if (taskrc->labels[line] == 0) {
-    if (taskrc->tasks[line] == 0)
+  if (taskrc->labels[line - 1] == 0) {
+    if (taskrc->tasks[line - 1] == 0)
       q = calloc(1, 1);
     else
-      q = formT(*taskrc->tasks[line]);
+      q = formT(*taskrc->tasks[line - 1]);
   } else
-    q = formL(*taskrc->labels[line]);
+    q = formL(*taskrc->labels[line - 1]);
   // TODO: comment
   fseek(fp, 0, SEEK_END);
   unsigned long fsize = ftell(fp);

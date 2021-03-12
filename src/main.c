@@ -13,7 +13,13 @@ int main(int argc, char** argv) {
   }
   struct cliargs* args = cliclient(argv[0]);
   bool res = cliexecuteall(args, argc - 1, argv + 1);
-  if (!res)
-    error("Unknown argument \e[1m%s\e[0m #%u. Try \e[1m%s help\e[0m", cligeterror().token, cligeterror().position, argv[0]);
+  if (!res) {
+    if (cligeterror().addit == -1)
+      error("Unknown argument \e[1m%s\e[0m #%u. Try \e[1m%s help\e[0m", 
+          cligeterror().token, cligeterror().position + 1, argv[0]);
+    else
+      error("Unknown argument \e[1m%s\e[0m+%d #%u. Try \e[1m%s help\e[0m", 
+          cligeterror().token, cligeterror().addit, cligeterror().position + 1, argv[0]);
+  }
   return(!res);
 }
