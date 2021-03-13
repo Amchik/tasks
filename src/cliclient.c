@@ -22,13 +22,19 @@ static char* zarg;
 
 void _calcerrors(struct TaskRcContents rc);
 
+#ifndef CLICLIENT_NOWARN
 void dowarn(struct TaskRcContents* rc) {
+#ifndef CLICLIENT_NOFILEWARN
   if ((DOWARN & 1) == 1)
     echo("Using file \e[1mTasksfile\e[0m. Run tasks with \e[1muse %%\e[0m for select \e[1m~/.taskrc\e[0m");
+#endif
   if (rc != 0)
     _calcerrors(*rc);
   DOWARN = 0;
 }
+#else
+void dowarn(struct TaskRcContents* rc) {}
+#endif
 
 void _calcerrors(struct TaskRcContents rc) {
   unsigned int count = 0;
@@ -82,6 +88,39 @@ FILE* _openfp(const char* mode) {
     return(0);
   }
   return(fp);
+}
+
+void _prinrcreserr(struct rcparseresult* res, int i) {
+  char* q = UNKNOWN;
+  if (res->query) q = res->query;
+  printf("\e[1;31merror\e[0;1m:%u:%u-%u:\e[0m [%u] %s\n %3d | %s\n     | \e[1;31m", 
+      i + 1, res->error.cstart, res->error.cend, res->error.code, rcprsgeterrordesc(res->error.code), i + 1,
+      q);
+  if (res->error.cstart <= res->error.cend) {
+    for(int i = 0; i < (int)res->error.cstart; i++) putc(' ', stdout);
+    putc('^', stdout);
+    for(int i = 0; i < (int)res->error.cend - (int)res->error.cstart - 2; i++) putc('~', stdout);
+    printf("\e[0m\n");
+  }
+}
+
+void onnewln(cliarg_t* arg) {
+  dowarn(0);
+  char* q = arg->argument;
+  size_t _ = 0;
+  struct rcparseresult res = rcparseln(q, &_);
+  res.query = q;
+  if (res.error.code != 0) {
+    error("Cannot append query:");
+    _prinrcreserr(&res, 1);
+    exit(2);
+    return;
+  }
+  echo("Found \"%s\" with type %s.", res.statement.primary, res.statement.type);
+  FILE* fp = _openfp("a");
+  fprintf(fp, "\n%s", res.query);
+  fclose(fp);
+  echo("Successefully appended new query.");
 }
 
 void oneditln(cliarg_t* arg) {
@@ -202,17 +241,7 @@ void ondiagnostic(cliarg_t* arg) {
     struct rcparseresult* res = rc.results[i];
     if (res && res->error.code >= 100) {
       count++;
-      char* q = UNKNOWN;
-      if (res->query) q = res->query;
-      printf("\e[1;31merror\e[0;1m:%u:%u-%u:\e[0m [%u] %s\n %3d | %s\n     | \e[1;31m", 
-          i + 1, res->error.cstart, res->error.cend, res->error.code, rcprsgeterrordesc(res->error.code), i + 1,
-          q);
-      if (res->error.cstart <= res->error.cend) {
-        for(int i = 0; i < (int)res->error.cstart; i++) putc(' ', stdout);
-        putc('^', stdout);
-        for(int i = 0; i < (int)res->error.cend - (int)res->error.cstart - 2; i++) putc('~', stdout);
-        printf("\e[0m\n");
-      }
+      _prinrcreserr(res, i);
       continue;
     }
   }
@@ -265,6 +294,7 @@ struct cliargs* cliclient(char* arg0) {
     cliargs("diagnostic", ondiagnostic, 0),
     cliargs("edit",       oneditln,     4),
     cliargs("delete",     oneditln,     2),
+    cliargs("new",        onnewln,      1),
     {0,0,0}
   };
   struct cliargs* _ = malloc(sizeof(args));

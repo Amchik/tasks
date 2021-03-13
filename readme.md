@@ -82,3 +82,8 @@ For build main executeable type `make`.
 
 For run unit tests use `make check`.
 
+Build with CFLAG `-DCLICLIENT_NOWARN` for disable
+any warning in cliclient. Also you can disable only
+file warning (Using file Tasksfile. Run...) via 
+`-DCLICLIENT_NOFILEWARN`.
+
