@@ -14,6 +14,7 @@ print it as table.
 * `use <file>` - Change current file
 * `edit <type> <primary key or @NUM for task type> <key> <value>` - Edit record
 * `delete <type> <primary eky or @NUM for task type>` - Remove record
+* `new <query>` - Append `query` to taskrc.
 
 By defaults uses `Tasksfile` and `~/.taskrc`
 
