@@ -15,6 +15,20 @@
 
 #define UNKNOWN "\e[0;37m<unknown source>\e[0m"
 
+#define HELP_MESSAGE "Usage: %s\n" \
+  "\t %s [token [argument]...]...\n" \
+  "Token (arguments):\n" \
+  "\t• \e[1muse <file>\e[0m - Select a file to use. \e[3muse %%\e[0m selects ~/.taskrc\n" \
+  "\t• \e[1mtable     \e[0m - Prints a pretty table by the file.\n" \
+  "\t• \e[1mdiagnostic\e[0m - Show a errors in file.\n" \
+  "\t• \e[1medit <type> <primary> <key> <value>\e[0m -\n" \
+  "\t\tEdit a record of type with primary key. Read man-page for more info.\n" \
+  "\t• \e[1mdelete <type> <primary>\e[0m - Like edit, but delete record\n" \
+  "\t• \e[1mnew <query>\e[0m - Appends a query to taskrc.\n" \
+  "\n" \
+  "For more information check man-page \e[1mtasks(1)\e[0m or see" \
+  " README.md at github.com/Amchik/tasks\n"
+
 static unsigned int DOWARN = 0;
 
 static char* CURRENT_FILE;
@@ -121,6 +135,11 @@ void onnewln(cliarg_t* arg) {
   fprintf(fp, "\n%s", res.query);
   fclose(fp);
   echo("Successefully appended new query.");
+}
+
+void onhelp(cliarg_t* arg) {
+  printf(HELP_MESSAGE, zarg, zarg);
+  exit(0);
 }
 
 void oneditln(cliarg_t* arg) {
@@ -295,6 +314,7 @@ struct cliargs* cliclient(char* arg0) {
     cliargs("edit",       oneditln,     4),
     cliargs("delete",     oneditln,     2),
     cliargs("new",        onnewln,      1),
+    cliargs("help",       onhelp,       0),
     {0,0,0}
   };
   struct cliargs* _ = malloc(sizeof(args));
