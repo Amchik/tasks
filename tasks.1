@@ -1,4 +1,4 @@
-.TH TASKS 2 "March 13 2021" "Amchik" "User Commands"
+.TH TASKS 1 "March 13 2021" "Amchik" "User Commands"
 .SH NAME
 tasks \- Simple ToDo Manager
 .SH SYNOPSIS
@@ -11,6 +11,11 @@ tasks \- Simple ToDo Manager
 Tasks (Amchik/tasks) is a simple ToDo manager written
 in C99. Have own config (taskrc or Tasksfile) format,
 that simple and can be read without formatting.
+
+.TP
+.B "help"
+.br
+Show a very base documentaion.
 
 .TP
 .B "use" <\fI\,file\/\fR>
@@ -39,7 +44,7 @@ table. See section \fBEDITING TASKRC\fR for more info.
 .TP
 .B "delete" <\fI\,type\/\fR> <\fI\,primary\/\fR>
 .br
-Edit a record of type \fI\,type\/\fR with primary
+Delete a record of type \fI\,type\/\fR with primary
 key \fI\,primary\/\fR. Like \fBedit\fR in type
 \fItask\fR you can pass \fB@\fINUM\fR, where NUM
 is number of task in table.
